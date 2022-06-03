@@ -118,7 +118,8 @@
 
 
 ;;; Clojure special hdvs
-(def special-hdv-keys [:nil])
+(def special-hdv-keys [:nil
+                       :woggle])
 
 (defn add-special-hdvs!
   []
@@ -127,6 +128,11 @@
 
 (defn hdv-nil []
   (get-hdv :nil))
+
+(defn curly-brace
+  "My daughter calls a { a woggle"
+  []
+  (get-hdv :woggle))
 
 (defn reset-hdv-mem! []
   (reset-mem!)
