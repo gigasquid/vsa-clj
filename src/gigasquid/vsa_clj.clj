@@ -79,7 +79,8 @@
 (defn add-to-cleanup-mem
   "Adds a new symbol/value pair to the cleanup memory"
   [k v]
-  (swap! cleanup-mem merge {k v}))
+  (swap! cleanup-mem merge {k v})
+  v)
 
 
 (defn query-cleanup-mem
@@ -116,9 +117,26 @@
        (query-cleanup-mem)))
 
 
+;;; Clojure special hdvs
+(def special-hdv-keys [:nil])
+
+(defn add-special-hdvs!
+  []
+  (doseq [k special-hdv-keys]
+    (add-hdv! k)))
+
+(defn hdv-nil []
+  (get-hdv :nil))
+
+(defn reset-hdv-mem! []
+  (reset-mem!)
+  (add-special-hdvs!))
+
+(reset-hdv-mem!)
+
+
 (comment
 
-  (reset-mem!)
 
   (add-hdv! :name)
   (add-hdv! "Alice")
