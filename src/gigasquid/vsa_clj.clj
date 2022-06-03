@@ -105,6 +105,16 @@
   [k]
   (add-to-cleanup-mem k (hdv)))
 
+(defn unbind-get
+  "Gets the key hdv from the memory and unbinds
+  (bind is the inverse of itself) the
+   value from the bundle hdv. Queries the cleaned up vector
+   from memory"
+  [hdv k]
+  (->> (get-hdv k)
+       (bind hdv)
+       (query-cleanup-mem)))
+
 
 (comment
 
@@ -123,19 +133,19 @@
              (bundle
               (bind (get-hdv :high-score) (get-hdv 1000)))))
 
-  (query-cleanup-mem (bind H (get-hdv :name)))
+  (unbind-get H :name)
   ;; ["Alice" #tech.v3.tensor<int8>[1000000]
   ;;  [-1 1 1 ... 1 -1 -1]]
 
-  (query-cleanup-mem (bind H (get-hdv :yob)))
+  (unbind-get H :yob)
  ;;  [1980 #tech.v3.tensor<int8>[1000000]
 ;; [-1 -1 1 ... -1 -1 -1]]
 
-  (query-cleanup-mem (bind H (get-hdv :high-score)))
+  (unbind-get H :high-score)
  ;;  [1000 #tech.v3.tensor<int8>[1000000]
 ;; [-1 -1 1 ... -1 1 1]]
 
-  (query-cleanup-mem (bind H (get-hdv "Alice")))
+  (unbind-get H "Alice")
  ;; [:name #tech.v3.tensor<int8>[1000000]
 ;; [-1 1 -1 ... -1 -1 -1]]
   )
