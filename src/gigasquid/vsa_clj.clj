@@ -117,26 +117,8 @@
        (query-cleanup-mem)))
 
 
-;;; Clojure special hdvs
-(def special-hdv-keys [:nil
-                       :woggle])
-
-(defn add-special-hdvs!
-  []
-  (doseq [k special-hdv-keys]
-    (add-hdv! k)))
-
-(defn hdv-nil []
-  (get-hdv :nil))
-
-(defn curly-brace
-  "My daughter calls a { a woggle"
-  []
-  (get-hdv :woggle))
-
 (defn reset-hdv-mem! []
-  (reset-mem!)
-  (add-special-hdvs!))
+  (reset-mem!))
 
 (reset-hdv-mem!)
 
