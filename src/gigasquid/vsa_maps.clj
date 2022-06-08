@@ -38,7 +38,6 @@
             (vsa-clj/hdv)
             m)))
 
-
 ;;;; Tests
 
 (deftest test-vsa-assoc

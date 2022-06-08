@@ -86,13 +86,25 @@
 (defn query-cleanup-mem
   "Finds the nearest neighbor to the hdv by using the dot product.
    Then returns the cleaned vector"
+  ([query-v]
+   (query-cleanup-mem query-v false))
+  ([query-v verbose?]
+   (let [sorted-dot (->> @cleanup-mem
+                         (map (fn [[k v]]
+                                {k v :dot (dtype-fn/dot-product v query-v)}))
+                         (sort-by :dot))]
+     (if verbose?
+       sorted-dot
+       (->> sorted-dot last first)))))
+
+(defn query-cleanup-mem-verbose
+  "Finds the nearest neighbor to the hdv by using the dot product and cosine.
+   Then returns the cleaned vector - returns all results and score"
   [query-v]
   (->> @cleanup-mem
        (map (fn [[k v]]
-              {k v :dot (dtype-fn/dot-product v query-v)}))
-       (sort-by :dot)
-       last
-       first))
+              {k v :dotx (dtype-fn/dot-product v query-v)}))
+       (sort-by :dot)))
 
 
 (defn get-hdv
