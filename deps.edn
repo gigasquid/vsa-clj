@@ -3,12 +3,12 @@
         org.apache.logging.log4j/log4j-api {:mvn/version "2.17.2"}
         techascent/tech.ml.dataset {:mvn/version "6.087"
                                     :exclusion [org.apache.logging.log4j/log4j-api]}}
+ :jvm-opts ["--add-modules" "jdk.incubator.vector"]
  :aliases
- {:test
-  {:extra-paths ["test"]
-   :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
-                io.github.cognitect-labs/test-runner
-                {:git/tag "v0.5.0" :git/sha "48c3c67"}}}
-  :build {:deps {io.github.seancorfield/build-clj
-                 {:git/tag "v0.6.5" :git/sha "972031a"}}
-          :ns-default build}}}
+ {:test {:extra-paths ["test"]
+         :jvm-opts ["--add-modules" "jdk.incubator.vector"]
+         :extra-deps {io.github.cognitect-labs/test-runner
+                      {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                       :sha "9e35c979860c75555adaff7600070c60004a0f44"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}}}

@@ -83,7 +83,6 @@
       (recur (unprotect new-v) (dec i)))))
 
 
-
 ;;; The cleanup memory stores the hdv without any noise. When a hdv
 ;; is retrieved from the bundle it has some amount of noise associated with it. It helps to use the cleaned version after retrieving it for futher operations
 (def cleanup-mem (atom {}))

@@ -46,12 +46,12 @@
             m)))
 
 
-(defn vsa-init-stack
+(defn vsa-stack-vector
   "Inits a clojure like vector/stack into the HDV denoted by a key/value pair that indicates the number of elements in the stack - defaults to 0"
   []
   (vsa-assoc (vsa-clj/hdv) STACK_COUNT_KEY 0))
 
-(defn vsa-push
+(defn vsa-conj
   "Adds (bundles) the target hdv to the base hdv in a stack context but first protects it by rotation. Need to call vsa-init-stack on the base-hdv first"
   [base-hdv target-hdv]
   (let [[p-count _] (vsa-get base-hdv STACK_COUNT_KEY)
@@ -63,103 +63,3 @@
 
 ;;;; Tests
 
-(deftest test-vsa-assoc
-  (testing "testing (assoc nil :x 1)"
-      (vsa-clj/reset-hdv-mem!)
-      (let [m (vsa-assoc nil :x 1)
-            [v _] (vsa-get m :x)
-            [k _] (vsa-get m 1)]
-        (is (= {:x 1} {k v}))
-        (is (= 2 (count @vsa-clj/cleanup-mem)))))
-
-  (testing "testing (assoc hdv :y 1)"
-    (vsa-clj/reset-hdv-mem!)
-    (let [m1 (vsa-assoc nil :x 1)
-          m2 (vsa-assoc m1 :y 2)
-          [v1 _] (vsa-get m2 :x)
-          [k1 _] (vsa-get m2 1)
-          [v2 _] (vsa-get m2 :y)
-          [k2 _] (vsa-get m2 2)]
-      (is (= {:x 1 :y 2} {k1 v1 k2 v2}))
-      (is (= 4 (count @vsa-clj/cleanup-mem)))))
-
-  (testing "(assoc nil :x 1 :y 2 :z 3)"
-    (vsa-clj/reset-hdv-mem!)
-    (let [m (vsa-assoc nil :x 1 :y 2 :z 3)
-          [v1 _] (vsa-get m :x)
-          [k1 _] (vsa-get m 1)
-          [v2 _] (vsa-get m :y)
-          [k2 _] (vsa-get m 2)
-          [v3 _] (vsa-get m :z)
-          [k3 _] (vsa-get m 3)]
-      (is (= {:x 1 :y 2 :z 3} {k1 v1 k2 v2 k3 v3}))
-      (is (= 6 (count @vsa-clj/cleanup-mem))))))
-
-
-(deftest test-map->vsa
-  (testing "{}"
-    (vsa-clj/reset-mem!)
-    (let [ret-hdv (map->vsa {})]
-      (is (nil? ret-hdv))))
-
-  (testing "{:x 1}"
-    (vsa-clj/reset-mem!)
-    (let [ret-hdv (map->vsa {:x 1})
-          [v1 _] (vsa-get ret-hdv :x)
-          [k1 _] (vsa-get ret-hdv 1)]
-      (is (= {:x 1} {k1 v1}))
-      (is (= 2 (count @vsa-clj/cleanup-mem)))))
-
-  (testing "{:x 1 :y 2 :z 3}"
-    (vsa-clj/reset-mem!)
-    (let [ret-hdv (map->vsa {:x 1 :y 2 :z 3})
-          [v1 _] (vsa-get ret-hdv :x)
-          [k1 _] (vsa-get ret-hdv 1)
-          [v2 _] (vsa-get ret-hdv :y)
-          [k2 _] (vsa-get ret-hdv 2)
-          [v3 _] (vsa-get ret-hdv :z)
-          [k3 _] (vsa-get ret-hdv 3)]
-      (is (= {:x 1 :y 2 :z 3} {k1 v1 k2 v2 k3 v3}))
-      (is (= 6 (count @vsa-clj/cleanup-mem))))))
-
-(deftest test-vsa-init-stack
-  (vsa-clj/reset-mem!)
-  (let [h (map->vsa {:x 1})
-        ret-hdv (vsa-clj/bundle (vsa-init-stack) h)
-        [v _] (vsa-get ret-hdv STACK_COUNT_KEY)]
-    (is (= 0 v))))
-
-(deftest test-vsa-push
-  (testing "[{:x 1} {:x 2}]"
-    (vsa-clj/reset-mem!)
-    (let [ret-v (-> (vsa-init-stack)
-                     (vsa-push (map->vsa {:x 1}))
-                     (vsa-push (map->vsa {:x 2}))
-                     (vsa-push (map->vsa {:x 3})))
-          [x3 _] (vsa-get ret-v :x)
-          [x2 _] (-> ret-v
-                     (vsa-clj/unprotect)
-                     (vsa-get :x))
-          [x1 _] (-> ret-v
-                     (vsa-clj/unprotect)
-                     (vsa-clj/unprotect)
-                     (vsa-get :x))
-          [stack-count _] (vsa-get ret-v STACK_COUNT_KEY)]
-      (is (= 1 x1))
-      (is (= 2 x2))
-      (is (= 3 x3))
-      (is (= 3 stack-count))))
-
-
-  (testing "[{:x 1} {:x 2} {:x 3}] with get lookup"
-    (vsa-clj/reset-mem!)
-    (let [ret-v (-> (vsa-init-stack)
-                     (vsa-push (map->vsa {:x 1}))
-                     (vsa-push (map->vsa {:x 2}))
-                     (vsa-push (map->vsa {:x 3})))
-          [x1 _] (vsa-get ret-v :x 0)
-          [x2 _] (vsa-get ret-v :x 1)
-          [x3 _] (vsa-get ret-v :x 2)]
-      (is (= 1 x1))
-      (is (= 2 x2))
-      (is (= 3 x3)))))
