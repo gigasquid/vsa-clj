@@ -54,15 +54,33 @@
 
 
 (defn protect
-  "Protects a bundle value from additional bundling by rotating the hdv. Akin to a list / array function. More akin to push in a stack"
+  "Protects a bundle value from additional bundling by rotating the hdv. Akin to a list / array function. More akin to push in a stack."
   [v]
   (dtt/rotate v [1]))
+
+(defn protect-n
+  "Calls protect n times"
+  [v n]
+  (loop [i n
+         protect-v v]
+    (if (zero? n)
+      v
+      (recur (protect protect-v) (dec i)))))
 
 
 (defn unprotect
   "Reverse the rotation of the bundle. Like pop of a stack"
   [v]
   (dtt/rotate v [-1]))
+
+(defn unprotect-n
+  "Calls unprotect n times"
+  [v n]
+  (loop [i n
+         unprotect-v v]
+    (if (zero? n)
+      v
+      (recur (unprotect unprotect-v) (dec i)))))
 
 
 
