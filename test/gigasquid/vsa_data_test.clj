@@ -1,17 +1,18 @@
 (ns gigasquid.vsa-data-test
-  (:require  [clojure.test :refer :all]
-             [gigasquid.vsa-base :as vsa-base]
-             [gigasquid.vsa-data :as sut]))
+  (:require
+    [clojure.test :refer :all]
+    [gigasquid.vsa-base :as vsa-base]
+    [gigasquid.vsa-data :as sut]))
 
 
 (deftest test-vsa-assoc
   (testing "testing (assoc nil :x 1)"
-      (vsa-base/reset-hdv-mem!)
-      (let [m (sut/vsa-assoc nil :x 1)
-            [v _] (sut/vsa-get m :x)
-            [k _] (sut/vsa-get m 1)]
-        (is (= {:x 1} {k v}))
-        (is (= 2 (count @vsa-base/cleanup-mem)))))
+    (vsa-base/reset-hdv-mem!)
+    (let [m (sut/vsa-assoc nil :x 1)
+          [v _] (sut/vsa-get m :x)
+          [k _] (sut/vsa-get m 1)]
+      (is (= {:x 1} {k v}))
+      (is (= 2 (count @vsa-base/cleanup-mem)))))
 
   (testing "testing (assoc hdv :y 1)"
     (vsa-base/reset-hdv-mem!)
@@ -63,6 +64,7 @@
       (is (= {:x 1 :y 2 :z 3} {k1 v1 k2 v2 k3 v3}))
       (is (= 6 (count @vsa-base/cleanup-mem))))))
 
+
 (deftest test-vsa-stack-vector
   (vsa-base/reset-mem!)
   (let [h (sut/map->vsa {:x 1})
@@ -70,13 +72,14 @@
         [v _] (sut/vsa-get ret-hdv sut/STACK_COUNT_KEY)]
     (is (= 0 v))))
 
+
 (deftest test-vsa-conj
   (testing "[{:x 1} {:x 2}]"
     (vsa-base/reset-mem!)
     (let [ret-v (-> (sut/vsa-stack-vector)
-                     (sut/vsa-conj (sut/map->vsa {:x 1}))
-                     (sut/vsa-conj (sut/map->vsa {:x 2}))
-                     (sut/vsa-conj (sut/map->vsa {:x 3})))
+                    (sut/vsa-conj (sut/map->vsa {:x 1}))
+                    (sut/vsa-conj (sut/map->vsa {:x 2}))
+                    (sut/vsa-conj (sut/map->vsa {:x 3})))
           [x3 _] (sut/vsa-get ret-v :x)
           [x2 _] (-> ret-v
                      (vsa-base/unprotect)
@@ -95,9 +98,9 @@
   (testing "[{:x 1} {:x 2} {:x 3}] with get lookup"
     (vsa-base/reset-mem!)
     (let [ret-v (-> (sut/vsa-stack-vector)
-                     (sut/vsa-conj (sut/map->vsa {:x 1}))
-                     (sut/vsa-conj (sut/map->vsa {:x 2}))
-                     (sut/vsa-conj (sut/map->vsa {:x 3})))
+                    (sut/vsa-conj (sut/map->vsa {:x 1}))
+                    (sut/vsa-conj (sut/map->vsa {:x 2}))
+                    (sut/vsa-conj (sut/map->vsa {:x 3})))
           [x1 _] (sut/vsa-get ret-v :x 0)
           [x2 _] (sut/vsa-get ret-v :x 1)
           [x3 _] (sut/vsa-get ret-v :x 2)]

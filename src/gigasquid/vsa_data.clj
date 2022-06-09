@@ -1,8 +1,11 @@
 (ns gigasquid.vsa-data
   "clojure map data structures to hyperdimensional vectors"
-  (:require [gigasquid.vsa-base :as vsa-base]))
+  (:require
+    [gigasquid.vsa-base :as vsa-base]))
+
 
 (def STACK_COUNT_KEY :STACK_COUNT_KEY)
+
 
 (defn vsa-assoc
   "Like clojure assoc but result is bundled hdv. For non nested kvs"
@@ -16,10 +19,11 @@
    (let [ret (vsa-assoc hdv k v)]
      (if kvs
        (if (next kvs)
-        (recur ret (first kvs) (second kvs) (nnext kvs))
-        (throw (ex-info "vsa-assoc expects even number of args"
-                        {:args kvs})))
+         (recur ret (first kvs) (second kvs) (nnext kvs))
+         (throw (ex-info "vsa-assoc expects even number of args"
+                         {:args kvs})))
        ret))))
+
 
 (defn vsa-get
   "Like clojure get with a map but with hdv also works with a value
@@ -31,6 +35,7 @@
          unprotect-num (- (dec p-count) idx)
          new-v (vsa-base/unprotect-n hdv unprotect-num)]
      (vsa-get new-v k))))
+
 
 (defn map->vsa
   "Turn a clojure map (not nested) into a hdv"
@@ -49,6 +54,7 @@
   "Inits a clojure like vector/stack into the HDV denoted by a key/value pair that indicates the number of elements in the stack - defaults to 0"
   []
   (vsa-assoc (vsa-base/hdv) STACK_COUNT_KEY 0))
+
 
 (defn vsa-conj
   "Adds (bundles) the target hdv to the base hdv in a stack context but first protects it by rotation. Need to call vsa-init-stack on the base-hdv first"

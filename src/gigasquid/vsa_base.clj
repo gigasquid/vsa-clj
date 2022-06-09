@@ -3,14 +3,13 @@
     [tech.v3.datatype.functional :as dtype-fn]
     [tech.v3.tensor :as dtt]))
 
-;;; Following examples in "An Introduction to Hyperdimensional Computing for Robotics"
-;;https://link.springer.com/article/10.1007/s13218-019-00623-z
 
-;;; Uses Gaylor Method for HDV Operations
+;; Following examples in "An Introduction to Hyperdimensional Computing for Robotics"
+;; https://link.springer.com/article/10.1007/s13218-019-00623-z
 
+;; Uses Gaylor Method for HDV Operations
 
-(def size 1e6)
-
+(def size 1e6)  ; big enough for the "Blessing of Dimensionality"
 
 (defn binary-rand
   "Choose a random binary magnitude for the vector +1 or -1"
@@ -58,6 +57,7 @@
   [v]
   (dtt/rotate v [1]))
 
+
 (defn protect-n
   "Calls protect n times"
   [v n]
@@ -73,6 +73,7 @@
   [v]
   (dtt/rotate v [-1]))
 
+
 (defn unprotect-n
   "Calls unprotect n times"
   [v n]
@@ -83,9 +84,10 @@
       (recur (unprotect new-v) (dec i)))))
 
 
-;;; The cleanup memory stores the hdv without any noise. When a hdv
+;; The cleanup memory stores the hdv without any noise. When a hdv
 ;; is retrieved from the bundle it has some amount of noise associated with it. It helps to use the cleaned version after retrieving it for futher operations
 (def cleanup-mem (atom {}))
+
 
 (defn reset-mem!
   "Resets the cleanup memory"
@@ -114,6 +116,7 @@
        sorted-dot
        (->> sorted-dot last first)))))
 
+
 (defn query-cleanup-mem-verbose
   "Finds the nearest neighbor to the hdv by using the dot product and cosine.
    Then returns the cleaned vector - returns all results and score"
@@ -135,6 +138,7 @@
   [k]
   (add-to-cleanup-mem k (hdv)))
 
+
 (defn unbind-get
   "Gets the key hdv from the memory and unbinds
   (bind is the inverse of itself) the
@@ -146,8 +150,10 @@
        (query-cleanup-mem)))
 
 
-(defn reset-hdv-mem! []
+(defn reset-hdv-mem!
+  []
   (reset-mem!))
+
 
 (reset-hdv-mem!)
 
