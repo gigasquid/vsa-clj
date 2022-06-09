@@ -123,7 +123,12 @@
   [query-v]
   (->> @cleanup-mem
        (map (fn [[k v]]
-              {k v :dotx (dtype-fn/dot-product v query-v)}))
+              (let [dotx (dtype-fn/dot-product v query-v)]
+                {k v
+                 :dotx dotx
+                 :cos-sim (/ dotx
+                             (* (dtype-fn/magnitude v)
+                                (dtype-fn/magnitude query-v)))})))
        (sort-by :dot)))
 
 

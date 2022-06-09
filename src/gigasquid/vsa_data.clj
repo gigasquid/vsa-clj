@@ -1,7 +1,8 @@
 (ns gigasquid.vsa-data
   "clojure map data structures to hyperdimensional vectors"
   (:require
-    [gigasquid.vsa-base :as vsa-base]))
+    [gigasquid.vsa-base :as vsa-base]
+    [tech.v3.datatype.functional :as dtype-fn]))
 
 
 (def STACK_COUNT_KEY :STACK_COUNT_KEY)
@@ -65,3 +66,11 @@
     (-> protected-base-hdv
         (vsa-assoc STACK_COUNT_KEY new-p-count)
         (vsa-base/bundle target-hdv))))
+
+
+(comment
+
+  (def x (map->vsa {:x 1 :y 2 :z 3}))
+  (vsa-base/query-cleanup-mem-verbose (last (vsa-get x :x)))
+
+  )
