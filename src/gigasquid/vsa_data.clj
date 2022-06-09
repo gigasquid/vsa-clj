@@ -1,7 +1,8 @@
 (ns gigasquid.vsa-data
   "clojure map data structures to hyperdimensional vectors"
-  (:require [gigasquid.vsa-base :as vsa-base]
-            [clojure.test :refer [deftest is testing run-tests]]))
+  (:require [gigasquid.vsa-base :as vsa-base]))
+
+(def STACK_COUNT_KEY :STACK_COUNT_KEY)
 
 (defn vsa-assoc
   "Like clojure assoc but result is bundled hdv. For non nested kvs"
@@ -19,8 +20,6 @@
         (throw (ex-info "vsa-assoc expects even number of args"
                         {:args kvs})))
        ret))))
-
-(def STACK_COUNT_KEY :STACK_COUNT_KEY)
 
 (defn vsa-get
   "Like clojure get with a map but with hdv also works with a value
@@ -60,6 +59,3 @@
     (-> protected-base-hdv
         (vsa-assoc STACK_COUNT_KEY new-p-count)
         (vsa-base/bundle target-hdv))))
-
-;;;; Tests
-
