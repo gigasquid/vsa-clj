@@ -1,4 +1,4 @@
-(ns gigasquid.vsa-clj
+(ns gigasquid.vsa-base
   (:require
     [tech.v3.datatype.functional :as dtype-fn]
     [tech.v3.tensor :as dtt]))
