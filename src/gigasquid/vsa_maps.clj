@@ -29,8 +29,9 @@
    (vsa-clj/unbind-get hdv k))
   ([hdv k idx]
    (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)
-         unprotect-num (- (dec p-count) idx)]
-     (vsa-clj/unprotect-n hdv unprotect-num))))
+         unprotect-num (- (dec p-count) idx)
+         new-v (vsa-clj/unprotect-n hdv unprotect-num)]
+     (vsa-get new-v k))))
 
 (defn map->vsa
   "Turn a clojure map (not nested) into a hdv"
@@ -150,16 +151,15 @@
       (is (= 3 stack-count))))
 
 
-  #_(testing "[{:x 1} {:x 2}] with get lookup"
+  (testing "[{:x 1} {:x 2} {:x 3}] with get lookup"
     (vsa-clj/reset-mem!)
     (let [ret-v (-> (vsa-init-stack)
                      (vsa-push (map->vsa {:x 1}))
-                     (vsa-push (map->vsa {:x 2})))
+                     (vsa-push (map->vsa {:x 2}))
+                     (vsa-push (map->vsa {:x 3})))
           [x1 _] (vsa-get ret-v :x 0)
-          [x2 _] (vsa-get ret-v :x 1)]
-      (is (= [1 2] [x1 x2]))))
-
-
-  )
-
-
+          [x2 _] (vsa-get ret-v :x 1)
+          [x3 _] (vsa-get ret-v :x 2)]
+      (is (= 1 x1))
+      (is (= 2 x2))
+      (is (= 3 x3)))))

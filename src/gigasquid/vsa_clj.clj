@@ -61,11 +61,11 @@
 (defn protect-n
   "Calls protect n times"
   [v n]
-  (loop [i n
-         protect-v v]
-    (if (zero? n)
-      v
-      (recur (protect protect-v) (dec i)))))
+  (loop [new-v v
+         i n]
+    (if (zero? i)
+      new-v
+      (recur (protect new-v) (dec i)))))
 
 
 (defn unprotect
@@ -76,11 +76,11 @@
 (defn unprotect-n
   "Calls unprotect n times"
   [v n]
-  (loop [i n
-         unprotect-v v]
-    (if (zero? n)
-      v
-      (recur (unprotect unprotect-v) (dec i)))))
+  (loop [new-v v
+         i n]
+    (if (zero? i)
+      new-v
+      (recur (unprotect new-v) (dec i)))))
 
 
 
