@@ -1,8 +1,7 @@
 (ns gigasquid.vsa-data
   "clojure map data structures to hyperdimensional vectors"
   (:require
-    [gigasquid.vsa-base :as vsa-base]
-    [tech.v3.datatype.functional :as dtype-fn]))
+    [gigasquid.vsa-base :as vsa-base]))
 
 
 (def STACK_COUNT_KEY :STACK_COUNT_KEY)
@@ -75,6 +74,15 @@
             (vsa-conj hdv (map->vsa x)))
           (vsa-stack-vector)
           v))
+
+
+(defn vsa-map-get
+  "Queries a HDV and returns all the stack items with the given k or v"
+  [hdv k]
+  (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)]
+    (mapv (fn [i]
+            (vsa-get hdv k i))
+          (range p-count))))
 
 
 (comment

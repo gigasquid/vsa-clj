@@ -124,3 +124,15 @@
       (is (= 1 x1))
       (is (= 2 x2))
       (is (= 3 x3)))))
+
+
+(deftest test-vsa-map-get
+  (testing "[{:x 1 :y 2}]"
+    (vsa-base/reset-mem!)
+    (let [base-hdv (sut/vector->vsa [{:x 1 :y 2}])
+          vx (sut/vsa-map-get base-hdv :x)
+          vy (sut/vsa-map-get base-hdv :y)]
+      (is (= 1 (count vx)))
+      (is (= [1 (map first vx)]))
+      (is (= 1 (count vy)))
+      (is (= [2 (map first vy)])))))
