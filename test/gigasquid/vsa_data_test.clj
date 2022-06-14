@@ -107,3 +107,20 @@
       (is (= 1 x1))
       (is (= 2 x2))
       (is (= 3 x3)))))
+
+
+(deftest test-vector->vsa
+  (testing "empty vector"
+    (vsa-base/reset-mem!)
+    (let [ret-v (sut/vector->vsa [])]
+      (is (= 0 (first (sut/vsa-get ret-v sut/STACK_COUNT_KEY))))))
+
+  (testing "[{:x 1} {:x 2} {:x 3}]"
+    (vsa-base/reset-mem!)
+    (let [ret-v (sut/vector->vsa [{:x 1} {:x 2} {:x 3}])
+          [x1 _] (sut/vsa-get ret-v :x 0)
+          [x2 _] (sut/vsa-get ret-v :x 1)
+          [x3 _] (sut/vsa-get ret-v :x 2)]
+      (is (= 1 x1))
+      (is (= 2 x2))
+      (is (= 3 x3)))))

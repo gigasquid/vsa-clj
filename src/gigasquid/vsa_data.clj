@@ -68,6 +68,15 @@
         (vsa-base/bundle target-hdv))))
 
 
+(defn vector->vsa
+  "Takes a clojure vector data structure filled with maps  (non-nested) and turns it into a vsa data structure"
+  [v]
+  (reduce (fn [hdv x]
+            (vsa-conj hdv (map->vsa x)))
+          (vsa-stack-vector)
+          v))
+
+
 (comment
 
   (def x (map->vsa {:x 1 :y 2 :z 3}))
