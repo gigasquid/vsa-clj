@@ -172,8 +172,8 @@
       (is (= 2 (-> results first (dissoc :dot :cos-sim) ffirst)))
       ;; idx 1 sim = 1
       (is (= [] (sut/vsa-get base :x 1 1)))
-      ;; idx 1 sim=0 (returns all possible items in mem) 3 + stack count
-      (is (= 4 (count (sut/vsa-get base :x 1 -1)))))))
+      ;; idx 1 sim=0 (returns all possible items in mem) 3 + stack count and 0
+      (is (= 5 (count (sut/vsa-get base :x 1 -1)))))))
 
 
 (deftest test-clj->vsa
