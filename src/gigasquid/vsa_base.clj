@@ -155,7 +155,7 @@
   (bind is the inverse of itself) the
    value from the bundle hdv. Queries the cleaned up vector
    from memory. With the parameter of a threshold, uses a cosine
-   simulatrity score (0 -> 1.0) for exact match.
+   similatrity score (0 -> 1.0) for exact match.
    Example a threshold of 0.1 would return a result if the score
    was greater than or equal to 0.1, otherwise nil.
    If no key hdv from mem was found it will return an exception

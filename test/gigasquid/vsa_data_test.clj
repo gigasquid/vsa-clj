@@ -164,7 +164,7 @@
       ;; idx nil sim=0 (returns all possible items in mem)
       (is (= 6 (count (sut/vsa-get base :x nil -1))))))
 
-  (testing "with a key,indx, and simularity"
+  (testing "with a key,indx, and similarity"
     (vsa-base/reset-hdv-mem!)
     (let [base (sut/vector->vsa [{:x 1} {:x 2}])
           results (sut/vsa-get base :x 1 0.1)]
