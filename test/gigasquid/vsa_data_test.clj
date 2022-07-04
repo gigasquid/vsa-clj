@@ -174,3 +174,17 @@
       (is (= [] (sut/vsa-get base :x 1 1)))
       ;; idx 1 sim=0 (returns all possible items in mem)
       (is (= 3 (count (sut/vsa-get base :x 1 0)))))))
+
+
+(deftest test-clj->vsa
+  (vsa-base/reset-hdv-mem!)
+  (is (= 1 (-> (sut/clj->vsa {:x 1})
+               (sut/vsa-get :x)
+               first)))
+  (is (= 1 (-> (sut/clj->vsa [{:x 1}])
+               (sut/vsa-get :x 0)
+               first)))
+  (is (thrown-with-msg? Exception #"Data structure not supported"
+        (sut/clj->vsa [{:x 1} 9])))
+  (is (thrown-with-msg? Exception #"Data structure not supported"
+        (sut/clj->vsa 3))))

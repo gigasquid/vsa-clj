@@ -89,6 +89,14 @@
           (range p-count))))
 
 
+(defn clj->vsa
+  "Takes either a vector of maps or a map and turns it into a vsa high dimensional vector"
+  [form]
+  (cond (and (vector? form) (every? map? form)) (vector->vsa form)
+        (map? form) (map->vsa form)
+        :else (throw (new Exception "Data structure not supported"))))
+
+
 (comment
 
 
@@ -96,5 +104,9 @@
   (def another (map->vsa {:r 8}))
   (def base (map->vsa {:x 1 :y 2 :z 3}))
 
+  (clj->vsa [1])
+
 
   )
+
+
