@@ -106,6 +106,8 @@
 
   (clj->vsa [1])
 
+  ;; todo implement keys function across a hdv by simularity threshold to see all keys
+
 
   )
 
