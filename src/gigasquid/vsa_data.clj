@@ -27,14 +27,18 @@
 
 (defn vsa-get
   "Like clojure get with a map but with hdv also works with a value
-   instead of a k. If passed an idx it will pop the pushed map value."
+   instead of a k. If passed an idx it will pop the pushed map value. If called with a threshold, it will return a vector of all items in memory that have a cosine simalarity threshold greater than or equal to it (range 0-1) example 0.1"
   ([hdv k]
-   (vsa-base/unbind-get hdv k))
+   (vsa-get hdv k nil nil))
   ([hdv k idx]
-   (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)
-         unprotect-num (- (dec p-count) idx)
-         new-v (vsa-base/unprotect-n hdv unprotect-num)]
-     (vsa-get new-v k))))
+   (vsa-get hdv k idx nil))
+  ([hdv k idx threshold]
+   (if (nil? idx)
+     (vsa-base/unbind-get hdv k threshold)
+     (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)
+           unprotect-num (- (dec p-count) idx)
+           new-v (vsa-base/unprotect-n hdv unprotect-num)]
+       (vsa-get new-v k)))))
 
 
 (defn map->vsa
@@ -76,7 +80,7 @@
           v))
 
 
-(defn vsa-map-get
+(defn vsa-mapv-get
   "Queries a HDV and returns all the stack items with the given k or v"
   [hdv k]
   (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)]
@@ -87,7 +91,39 @@
 
 (comment
 
-  (def x (map->vsa {:x 1 :y 2 :z 3}))
-  (vsa-base/query-cleanup-mem-verbose (last (vsa-get x :x)))
 
+  ;; need to do a vector->vsa
+
+  ;; then clj->vsa
+
+  (def another (map->vsa {:r 8}))
+  (def base (map->vsa {:x 1 :y 2 :z 3}))
+
+  (->> (vsa-base/get-hdv :y)
+        (vsa-base/bind base)
+        (vsa-base/query-cleanup-mem 0.1))
+
+  (vsa-get base :x 0 0.1)
+
+  
+  (vsa-base/query-cleanup-mem-verbose (last (vsa-get x :y)))
+  (vsa-base/query-cleanup-mem (last (vsa-get x :y)))
+
+  (vsa-base/reset-hdv-mem!)
+
+  (def items (vector->vsa [{:x 1} {:x 1 :y 2} {:x 1 :y 3} {:z 4}]))
+
+  (vsa-mapv-get items :x)
+
+  (vsa-get-similar items :x 0 0.5)
+
+
+  ;;; now we have a database like embedded in hdv
+  ;;; with a table of map values in the hypervector itself
+  ;;; we can do a query like select * where simlar to query-v
+  ;;; {:x 1 :y 1 :z 2} {:a 4 :b 5} {:x 1 :y 2 :a 4}
+  ;;query with {:x 1 :y 1} 
+
+  ;;; like filter but return all the items in 
+  
   )

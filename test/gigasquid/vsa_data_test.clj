@@ -126,13 +126,28 @@
       (is (= 3 x3)))))
 
 
-(deftest test-vsa-map-get
+(deftest test-vsa-mapv-get
   (testing "[{:x 1 :y 2}]"
     (vsa-base/reset-mem!)
     (let [base-hdv (sut/vector->vsa [{:x 1 :y 2}])
-          vx (sut/vsa-map-get base-hdv :x)
-          vy (sut/vsa-map-get base-hdv :y)]
+          vx (sut/vsa-mapv-get base-hdv :x)
+          vy (sut/vsa-mapv-get base-hdv :y)]
       (is (= 1 (count vx)))
-      (is (= [1 (map first vx)]))
+      (is (= [1] (map first vx)))
       (is (= 1 (count vy)))
-      (is (= [2 (map first vy)])))))
+      (is (= [2] (map first vy))))))
+
+
+(deftest test-vsa-get
+  (testing "with base vector and key"
+    (vsa-base/reset-hdv-mem!)
+    (let [base (sut/map->vsa {:x 1 :y 2 :z 3})]
+      (is (= 1 (first (sut/vsa-get base :x))))))
+
+  (testing "with a unknown key"
+    (vsa-base/reset-hdv-mem!)
+    (let [base (sut/map->vsa {:x 1 :y 2 :z 3})]
+      (is (thrown-with-msg?
+            clojure.lang.ExceptionInfo
+            #"No key found in memory"
+            (sut/vsa-get base :r))))))

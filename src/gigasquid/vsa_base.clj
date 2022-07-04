@@ -102,19 +102,15 @@
   v)
 
 
-(defn query-cleanup-mem
-  "Finds the nearest neighbor to the hdv by using the dot product.
-   Then returns the cleaned vector"
-  ([query-v]
-   (query-cleanup-mem query-v false))
-  ([query-v verbose?]
-   (let [sorted-dot (->> @cleanup-mem
-                         (map (fn [[k v]]
-                                {k v :dot (dtype-fn/dot-product v query-v)}))
-                         (sort-by :dot))]
-     (if verbose?
-       sorted-dot
-       (->> sorted-dot last first)))))
+(defn similarity-score
+  "Find the similarity between two hdvs by dot product and also
+  by cosine similarity"
+  [query-v v]
+  (let [dotx (dtype-fn/dot-product v query-v)]
+    {:dot dotx
+     :cos-sim (/ dotx
+                 (* (dtype-fn/magnitude v)
+                    (dtype-fn/magnitude query-v)))}))
 
 
 (defn query-cleanup-mem-verbose
@@ -123,13 +119,23 @@
   [query-v]
   (->> @cleanup-mem
        (map (fn [[k v]]
-              (let [dotx (dtype-fn/dot-product v query-v)]
-                {k v
-                 :dotx dotx
-                 :cos-sim (/ dotx
-                             (* (dtype-fn/magnitude v)
-                                (dtype-fn/magnitude query-v)))})))
+              (merge {k v} (similarity-score query-v v))))
        (sort-by :dot)))
+
+
+(defn query-cleanup-mem
+  "Finds the nearest neighbor to the hdv by using the dot product.
+   Then returns the cleaned vector. If given a theshold, uses cosine simalarity (0-1) and returns all the possible matches if they are greather than or equal to the threshold. Or none if there are no matches."
+  ([query-v]
+   (query-cleanup-mem query-v false))
+  ([threshold query-v]
+   (let [sorted-dot (query-cleanup-mem-verbose query-v)]
+     (if threshold
+       (->> sorted-dot
+            (filterv (fn [{:keys [cos-sim] :as result}]
+                       (when (>= cos-sim threshold)
+                         result))))
+       (-> sorted-dot last (dissoc :dot :cos-sim) last)))))
 
 
 (defn get-hdv
@@ -148,11 +154,21 @@
   "Gets the key hdv from the memory and unbinds
   (bind is the inverse of itself) the
    value from the bundle hdv. Queries the cleaned up vector
-   from memory"
-  [hdv k]
-  (->> (get-hdv k)
-       (bind hdv)
-       (query-cleanup-mem)))
+   from memory. With the parameter of a threshold, uses a cosine
+   simulatrity score (0 -> 1.0) for exact match.
+   Example a threshold of 0.1 would return a result if the score
+   was greater than or equal to 0.1, otherwise nil.
+   If no key hdv from mem was found it will return an exception
+   that no key was found"
+  ([hdv k]
+   (unbind-get hdv k nil))
+  ([hdv k threshold]
+   (let [key-v (get-hdv k)]
+     (if key-v
+       (->> (get-hdv k)
+            (bind hdv)
+            (query-cleanup-mem threshold))
+       (throw (ex-info "No key found in memory" {:key-value k}))))))
 
 
 (defn reset-hdv-mem!
