@@ -150,4 +150,16 @@
       (is (thrown-with-msg?
             clojure.lang.ExceptionInfo
             #"No key found in memory"
-            (sut/vsa-get base :r))))))
+            (sut/vsa-get base :r)))))
+
+  (testing "with a key and simularity"
+    (vsa-base/reset-hdv-mem!)
+    (let [base (sut/map->vsa {:x 1 :y 2 :z 3})
+          ;; idx nil and sim = 0.2
+          results (sut/vsa-get base :x nil 0.1)]
+      (is (= 1 (count results)))
+      (is (= 1 (-> results first (dissoc :dot :cos-sim) ffirst)))
+      ;; idx nil sim = 1
+      (is (= [] (sut/vsa-get base :x nil 1)))
+      ;; idx nil sim=0 (returns all possible items in mem)
+      (is (= 6 (count (sut/vsa-get base :x nil 0)))))))
