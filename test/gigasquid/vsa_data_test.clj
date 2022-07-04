@@ -162,7 +162,7 @@
       ;; idx nil sim = 1
       (is (= [] (sut/vsa-get base :x nil 1)))
       ;; idx nil sim=0 (returns all possible items in mem)
-      (is (< 1 (count (sut/vsa-get base :x nil 0))))))
+      (is (= 6 (count (sut/vsa-get base :x nil -1))))))
 
   (testing "with a key,indx, and simularity"
     (vsa-base/reset-hdv-mem!)
@@ -172,8 +172,8 @@
       (is (= 2 (-> results first (dissoc :dot :cos-sim) ffirst)))
       ;; idx 1 sim = 1
       (is (= [] (sut/vsa-get base :x 1 1)))
-      ;; idx 1 sim=0 (returns all possible items in mem)
-      (is (< 1 (count (sut/vsa-get base :x 1 0)))))))
+      ;; idx 1 sim=0 (returns all possible items in mem) 3 + stack count
+      (is (= 4 (count (sut/vsa-get base :x 1 -1)))))))
 
 
 (deftest test-clj->vsa
