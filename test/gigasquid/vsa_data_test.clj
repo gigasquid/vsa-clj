@@ -101,9 +101,9 @@
                     (sut/vsa-conj (sut/map->vsa {:x 1}))
                     (sut/vsa-conj (sut/map->vsa {:x 2}))
                     (sut/vsa-conj (sut/map->vsa {:x 3})))
-          [x1 _] (sut/vsa-get ret-v :x 0)
-          [x2 _] (sut/vsa-get ret-v :x 1)
-          [x3 _] (sut/vsa-get ret-v :x 2)]
+          [x1 _] (sut/vsa-get ret-v :x {:idx 0})
+          [x2 _] (sut/vsa-get ret-v :x {:idx 1})
+          [x3 _] (sut/vsa-get ret-v :x {:idx 2})]
       (is (= 1 x1))
       (is (= 2 x2))
       (is (= 3 x3)))))
@@ -118,9 +118,9 @@
   (testing "[{:x 1} {:x 2} {:x 3}]"
     (vsa-base/reset-mem!)
     (let [ret-v (sut/vector->vsa [{:x 1} {:x 2} {:x 3}])
-          [x1 _] (sut/vsa-get ret-v :x 0)
-          [x2 _] (sut/vsa-get ret-v :x 1)
-          [x3 _] (sut/vsa-get ret-v :x 2)]
+          [x1 _] (sut/vsa-get ret-v :x {:idx 0})
+          [x2 _] (sut/vsa-get ret-v :x {:idx 1})
+          [x3 _] (sut/vsa-get ret-v :x {:idx 2})]
       (is (= 1 x1))
       (is (= 2 x2))
       (is (= 3 x3)))))
@@ -152,28 +152,28 @@
             #"No key found in memory"
             (sut/vsa-get base :r)))))
 
-  (testing "with a key and simularity"
+  (testing "with a key and similarity"
     (vsa-base/reset-hdv-mem!)
     (let [base (sut/map->vsa {:x 1 :y 2 :z 3})
           ;; idx nil and sim = 0.2
-          results (sut/vsa-get base :x nil 0.1)]
+          results (sut/vsa-get base :x {:threshold 0.1})]
       (is (= 1 (count results)))
       (is (= 1 (-> results first (dissoc :dot :cos-sim) ffirst)))
       ;; idx nil sim = 1
-      (is (= [] (sut/vsa-get base :x nil 1)))
-      ;; idx nil sim=0 (returns all possible items in mem)
-      (is (= 6 (count (sut/vsa-get base :x nil -1))))))
+      (is (= [] (sut/vsa-get base :x {:threshold 1})))
+      ;; idx nil sim=-1 (returns all possible items in mem)
+      (is (= 6 (count (sut/vsa-get base :x {:threshold -1}))))))
 
   (testing "with a key,indx, and similarity"
     (vsa-base/reset-hdv-mem!)
     (let [base (sut/vector->vsa [{:x 1} {:x 2}])
-          results (sut/vsa-get base :x 1 0.1)]
+          results (sut/vsa-get base :x {:idx 1 :threshold 0.1})]
       (is (= 1 (count results)))
       (is (= 2 (-> results first (dissoc :dot :cos-sim) ffirst)))
       ;; idx 1 sim = 1
-      (is (= [] (sut/vsa-get base :x 1 1)))
+      (is (= [] (sut/vsa-get base :x {:idx 1 :threshold 1})))
       ;; idx 1 sim=0 (returns all possible items in mem) 3 + stack count and 0
-      (is (= 5 (count (sut/vsa-get base :x 1 -1)))))))
+      (is (= 5 (count (sut/vsa-get base :x {:idx 1 :threshold -1})))))))
 
 
 (deftest test-clj->vsa

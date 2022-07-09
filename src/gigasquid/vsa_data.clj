@@ -29,16 +29,14 @@
   "Like clojure get with a map but with hdv also works with a value
    instead of a k. If passed an idx it will pop the pushed map value. If called with a threshold, it will return a vector of all items in memory that have a cosine simalarity threshold greater than or equal to it (range 0-1) example 0.1"
   ([hdv k]
-   (vsa-get hdv k nil nil))
-  ([hdv k idx]
-   (vsa-get hdv k idx nil))
-  ([hdv k idx threshold]
+   (vsa-get hdv k {}))
+  ([hdv k {:keys [idx threshold]}]
    (if (nil? idx)
      (vsa-base/unbind-get hdv k threshold)
      (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)
            unprotect-num (- (dec p-count) idx)
            new-v (vsa-base/unprotect-n hdv unprotect-num)]
-       (vsa-get new-v k nil threshold)))))
+       (vsa-get new-v k {:threshold threshold})))))
 
 
 (defn map->vsa
@@ -100,13 +98,18 @@
 (comment
 
 
+  
 
   (def another (map->vsa {:r 8}))
   (def base (map->vsa {:x 1 :y 2 :z 3}))
 
   (clj->vsa [1])
 
-  ;; todo implement keys function across a hdv by similarity threshold to see all keys
+  ;; todo list
+  ;;; comparing compound value by threshold
+
+  {:likes :cucumbers} {:likes :tomatoes} {:likes :burgers}
+  ;; - implement keys function across a hdv by similarity threshold to see all keys
 
 
   )
