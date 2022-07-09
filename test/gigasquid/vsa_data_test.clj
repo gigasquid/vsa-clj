@@ -197,3 +197,11 @@
         (sut/clj->vsa [{:x 1} 9])))
   (is (thrown-with-msg? Exception #"Data structure not supported"
         (sut/clj->vsa 3))))
+
+
+(deftest test-inspect
+  (vsa-base/reset-hdv-mem!)
+  (let [v1 (sut/clj->vsa {:x 1 :y 2})
+        v2 (sut/clj->vsa {:a 4 :b 3 :x 8})]
+    (is (= #{:x :y 1 2} (sut/inspect v1)))
+    (is (= #{:a :b :x 3 4 8} (sut/inspect v2)))))

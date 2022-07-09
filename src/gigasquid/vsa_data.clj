@@ -1,5 +1,5 @@
 (ns gigasquid.vsa-data
-  "clojure map data structures to hyperdimensional vectors"
+  "clojure data structures to hyperdimensional vectors"
   (:require
     [gigasquid.vsa-base :as vsa-base]))
 
@@ -83,7 +83,7 @@
   [hdv k]
   (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)]
     (mapv (fn [i]
-            (vsa-get hdv k i))
+            (vsa-get hdv k {:idx i}))
           (range p-count))))
 
 
@@ -104,22 +104,24 @@
        (map ffirst)))
 
 
+(defn inspect
+  "Find all keys embedded in the hdv from mem"
+  ([hdv]
+   (inspect hdv 0.1))
+  ([hdv threshold]
+   (->>  @vsa-base/cleanup-mem
+         (map (fn [[k _]]
+                (vsa-get hdv k {:threshold threshold})))
+         (mapcat sim-result-keys)
+         (into #{}))))
+
+
 (comment
 
-
-  
-
-  (def another (map->vsa {:r 8}))
+  (vsa-base/reset-hdv-mem!)
   (def base (map->vsa {:x 1 :y 2 :z 3}))
 
-  (clj->vsa [1])
-
-  ;; todo list
-  ;;; comparing compound value by threshold
-
-  {:likes :cucumbers} {:likes :tomatoes} {:likes :burgers}
-  ;; - implement keys function across a hdv by similarity threshold to see all keys
-
+  ;; filter function
 
   )
 
