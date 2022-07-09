@@ -139,15 +139,17 @@
 
 
 (defn get-hdv
-  "Gets the clean hdv from the best match nosiy one"
+  "Gets the clean hdv from the memory by key"
   [k]
   (get @cleanup-mem k))
 
 
 (defn add-hdv!
   "Adds the hdv to the cleanup memory"
-  [k]
-  (add-to-cleanup-mem k (hdv)))
+  ([k]
+   (add-to-cleanup-mem k (hdv)))
+  ([k v]
+   (add-to-cleanup-mem k v)))
 
 
 (defn unbind-get
@@ -165,7 +167,7 @@
   ([hdv k threshold]
    (let [key-v (get-hdv k)]
      (if key-v
-       (->> (get-hdv k)
+       (->> key-v
             (bind hdv)
             (query-cleanup-mem threshold))
        (throw (ex-info "No key found in memory" {:key-value k}))))))

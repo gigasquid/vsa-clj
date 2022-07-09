@@ -95,6 +95,15 @@
         :else (throw (new Exception "Data structure not supported"))))
 
 
+(defn sim-result-keys
+  "Takes results from a similarity search and returns only the keys of the results,
+   stripping off the metrics"
+  [results-with-sim-metrics]
+  (->> results-with-sim-metrics
+       (map #(dissoc % :dot :cos-sim))
+       (map ffirst)))
+
+
 (comment
 
 

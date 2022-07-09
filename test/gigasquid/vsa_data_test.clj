@@ -173,7 +173,16 @@
       ;; idx 1 sim = 1
       (is (= [] (sut/vsa-get base :x {:idx 1 :threshold 1})))
       ;; idx 1 sim=0 (returns all possible items in mem) 3 + stack count and 0
-      (is (= 5 (count (sut/vsa-get base :x {:idx 1 :threshold -1})))))))
+      (is (= 5 (count (sut/vsa-get base :x {:idx 1 :threshold -1}))))))
+
+  (testing "comparing a compound value with the vector"
+    (vsa-base/reset-hdv-mem!)
+    (let [base (sut/clj->vsa {:x :yellow :y :blue :z :red})
+          _ (vsa-base/add-hdv! :green (vsa-base/bundle
+                                        (vsa-base/get-hdv :yellow)
+                                        (vsa-base/get-hdv :blue)))
+          results (sut/vsa-get base :green {:threshold 0.1})]
+      (is (= [:x :y] (sut/sim-result-keys results))))))
 
 
 (deftest test-clj->vsa
