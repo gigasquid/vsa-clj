@@ -25,18 +25,18 @@
        ret))))
 
 
-(defn vsa-get
+(defn v-get
   "Like clojure get with a map but with hdv also works with a value
    instead of a k. If passed an idx it will pop the pushed map value. If called with a threshold, it will return a vector of all items in memory that have a cosine simalarity threshold greater than or equal to it (range 0-1) example 0.1"
   ([hdv k]
-   (vsa-get hdv k {}))
+   (v-get hdv k {}))
   ([hdv k {:keys [idx threshold]}]
    (if (nil? idx)
      (vsa-base/unbind-get hdv k threshold)
-     (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)
+     (let [[p-count _] (v-get hdv STACK_COUNT_KEY)
            unprotect-num (- (dec p-count) idx)
            new-v (vsa-base/unprotect-n hdv unprotect-num)]
-       (vsa-get new-v k {:threshold threshold})))))
+       (v-get new-v k {:threshold threshold})))))
 
 
 (defn map->vsa
@@ -61,7 +61,7 @@
 (defn vsa-conj
   "Adds (bundles) the target hdv to the base hdv in a stack context but first protects it by rotation. Need to call vsa-init-stack on the base-hdv first"
   [base-hdv target-hdv]
-  (let [[p-count _] (vsa-get base-hdv STACK_COUNT_KEY)
+  (let [[p-count _] (v-get base-hdv STACK_COUNT_KEY)
         new-p-count (inc p-count)
         protected-base-hdv (vsa-base/protect base-hdv)]
     (-> protected-base-hdv
@@ -76,15 +76,6 @@
             (vsa-conj hdv (map->vsa x)))
           (vsa-stack-vector)
           v))
-
-
-(defn vsa-mapv-get
-  "Queries a HDV and returns all the stack items with the given k or v"
-  [hdv k]
-  (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)]
-    (mapv (fn [i]
-            (vsa-get hdv k {:idx i}))
-          (range p-count))))
 
 
 (defn clj->vsa
@@ -111,9 +102,18 @@
   ([hdv threshold]
    (->>  @vsa-base/cleanup-mem
          (map (fn [[k _]]
-                (vsa-get hdv k {:threshold threshold})))
+                (v-get hdv k {:threshold threshold})))
          (mapcat sim-result-keys)
          (into #{}))))
+
+
+(defn vsa-mapv-get
+  "Queries a HDV and returns all the stack items with the given k or v"
+  [hdv k]
+  (let [[p-count _] (v-get hdv STACK_COUNT_KEY)]
+    (mapv (fn [i]
+            (v-get hdv k {:idx i}))
+          (range p-count))))
 
 
 (comment
@@ -122,6 +122,9 @@
   (def base (map->vsa {:x 1 :y 2 :z 3}))
 
   ;; filter function
+  ;; v-map function (example v-map v-get)
+  ;; v-filter function (example v-filter v-get)
+  
 
   )
 
