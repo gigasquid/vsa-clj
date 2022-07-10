@@ -1,12 +1,8 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
-        org.apache.logging.log4j/log4j-api {:mvn/version "2.17.2"}
-        techascent/tech.ml.dataset {:mvn/version "6.087"
-                                    :exclusion [org.apache.logging.log4j/log4j-api]}}
- ;;:jvm-opts ["--add-modules" "jdk.incubator.vector"]
+        cnuernber/dtype-next {:mvn/version "9.028"}}
  :aliases
  {:test {:extra-paths ["test"]
-         ;;:jvm-opts ["--add-modules" "jdk.incubator.vector"]
          :extra-deps {io.github.cognitect-labs/test-runner
                       {:git/url "https://github.com/cognitect-labs/test-runner.git"
                        :sha "9e35c979860c75555adaff7600070c60004a0f44"}}

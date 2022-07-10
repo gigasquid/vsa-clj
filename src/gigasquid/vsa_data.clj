@@ -107,20 +107,34 @@
          (into #{}))))
 
 
-(defn vsa-mapv-get
-  "Queries a HDV and returns all the stack items with the given k or v"
-  [hdv k]
+(defn v-map
+  "Takes a hdv and maps the function across all the stack items in it with an parameter of idx i"
+  [f hdv]
   (let [[p-count _] (v-get hdv STACK_COUNT_KEY)]
-    (mapv (fn [i]
-            (v-get hdv k {:idx i}))
-          (range p-count))))
+    (loop [new-v hdv
+           i p-count
+           result []]
+      (if (zero? i)
+        (reverse result) ; reverse because the unprotect does it in stack order
+        (recur (vsa-base/unprotect new-v) (dec i) (conj result (f new-v)))))))
 
 
 (comment
 
   (vsa-base/reset-hdv-mem!)
   (def base (map->vsa {:x 1 :y 2 :z 3}))
+  (def b2 (map->vsa {:a 1}))
 
+  (inspect b2)
+
+  (def x (clj->vsa [{:a :blue} {:b :green}]))
+  (v-map #(first (v-get % :a {:threshold 0.1})) x)
+  (v-map inspect x)
+  (inspect (vsa-base/unprotect x))
+  (inspect x)
+
+
+  ;;; test for v-map
   ;; filter function
   ;; v-map function (example v-map v-get)
   ;; v-filter function (example v-filter v-get)

@@ -126,18 +126,6 @@
       (is (= 3 x3)))))
 
 
-(deftest test-vsa-mapv-get
-  (testing "[{:x 1 :y 2}]"
-    (vsa-base/reset-mem!)
-    (let [base-hdv (sut/vector->vsa [{:x 1 :y 2}])
-          vx (sut/vsa-mapv-get base-hdv :x)
-          vy (sut/vsa-mapv-get base-hdv :y)]
-      (is (= 1 (count vx)))
-      (is (= [1] (map first vx)))
-      (is (= 1 (count vy)))
-      (is (= [2] (map first vy))))))
-
-
 (deftest test-v-get
   (testing "with base vector and key"
     (vsa-base/reset-hdv-mem!)
@@ -205,3 +193,16 @@
         v2 (sut/clj->vsa {:a 4 :b 3 :x 8})]
     (is (= #{:x :y 1 2} (sut/inspect v1)))
     (is (= #{:a :b :x 3 4 8} (sut/inspect v2)))))
+
+
+(deftest test-v-map
+  (vsa-base/reset-hdv-mem!)
+  (let [v (sut/clj->vsa [{:a :blue} {:b :green}])]
+    (is (= [[:blue] []]
+           (sut/v-map #(->> (sut/v-get % :a {:threshold 0.1})
+                            (sut/sim-result-keys))
+                      v)))
+
+    (is (= [#{1 :STACK_COUNT_KEY :blue :a}
+            #{:green :STACK_COUNT_KEY 2 :b}]
+           (sut/v-map sut/inspect v)))))
