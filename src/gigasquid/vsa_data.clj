@@ -100,7 +100,7 @@
 
 
 (defn v-map
-  "Takes a hdv and maps the function across all the stack items in it with an parameter of idx i"
+  "Takes a hdv and maps the function across all the stack items in it. Unrolling stack from back to front"
   [f hdv]
   (let [[p-count _] (v-get hdv STACK_COUNT_KEY)]
     (loop [new-v hdv
@@ -111,21 +111,18 @@
         (recur (vsa-base/unprotect new-v) (dec i) (conj result (f new-v)))))))
 
 
-(comment
-
-  (vsa-base/reset-hdv-mem!)
-  (def base (map->vsa {:x 1 :y 2 :z 3}))
-  (def b2 (map->vsa {:a 1}))
-  (v-get base :x {:threshold 0.1})
-
-
-  (v-get b2 :a)
-
-  (inspect b2)
-
-  ;; v-filter function (example v-filter v-get)
-  
-
-  )
-
-
+(defn v-filter
+  "Takes a hdv and filters the predicate across all the stack items in it. Unrolling stack from back to front.
+  Returns a vector of the hdvs in the stack that match the predicate"
+  [pred hdv]
+  (let [[p-count _] (v-get hdv STACK_COUNT_KEY)]
+    (loop [new-v hdv
+           i p-count
+           result []]
+      (if (zero? i)
+        (->> (reverse result)
+             (remove nil?)) ; reverse because the unprotect does it in stack order
+        (do
+          (recur (vsa-base/unprotect new-v)
+                 (dec i)
+                 (conj result (when (not-empty (pred new-v)) new-v))))))))

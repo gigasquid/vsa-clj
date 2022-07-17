@@ -208,3 +208,18 @@
     (is (= [#{1 :STACK_COUNT_KEY :blue :a}
             #{:green :STACK_COUNT_KEY 2 :b}]
            (sut/v-map sut/inspect v)))))
+
+
+(deftest test-v-filter
+  (vsa-base/reset-hdv-mem!)
+  (testing "predicate returning true for 1 result"
+    (let [v (sut/clj->vsa [{:a :blue} {:b :green}])
+          result (sut/v-filter #(sut/v-get % :a {:threshold 0.1}) v)]
+      (is (= 1 (count result)))
+      (is (= [#{:a :blue 1 :STACK_COUNT_KEY}]
+             (map sut/inspect result)))))
+
+  (testing "predicate returning false for all"
+    (let [v (sut/clj->vsa [{:a :blue} {:b :green}])
+          result (sut/v-filter #(sut/v-get % :a {:threshold 1}) v)]
+      (is (= [] result)))))
