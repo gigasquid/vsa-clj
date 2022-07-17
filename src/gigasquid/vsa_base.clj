@@ -127,15 +127,20 @@
   "Finds the nearest neighbor to the hdv by using the dot product.
    Then returns the cleaned vector. If given a theshold, uses cosine simalarity (0-1) and returns all the possible matches if they are greather than or equal to the threshold. Or none if there are no matches."
   ([query-v]
-   (query-cleanup-mem query-v false))
-  ([threshold query-v]
+   (query-cleanup-mem nil nil query-v))
+  ([threshold verbose? query-v]
    (let [sorted-dot (query-cleanup-mem-verbose query-v)]
-     (if threshold
-       (->> sorted-dot
-            (filterv (fn [{:keys [cos-sim] :as result}]
-                       (when (>= cos-sim threshold)
-                         result))))
-       (-> sorted-dot last (dissoc :dot :cos-sim) last)))))
+     (cond->> (reverse sorted-dot)
+       threshold
+       (filterv (fn [{:keys [cos-sim] :as result}]
+                  (when (>= cos-sim threshold)
+                    result)))
+
+       (not verbose?)
+       (mapv (fn [result] (dissoc result :dot :cos-sim)))
+
+       (nil? threshold)
+       (ffirst)))))
 
 
 (defn get-hdv
@@ -163,13 +168,13 @@
    If no key hdv from mem was found it will return an exception
    that no key was found"
   ([hdv k]
-   (unbind-get hdv k nil))
-  ([hdv k threshold]
+   (unbind-get hdv k nil nil))
+  ([hdv k threshold verbose?]
    (let [key-v (get-hdv k)]
      (if key-v
        (->> key-v
             (bind hdv)
-            (query-cleanup-mem threshold))
+            (query-cleanup-mem threshold verbose?))
        (throw (ex-info "No key found in memory" {:key-value k}))))))
 
 

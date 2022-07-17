@@ -144,7 +144,7 @@
     (vsa-base/reset-hdv-mem!)
     (let [base (sut/map->vsa {:x 1 :y 2 :z 3})
           ;; idx nil and sim = 0.2
-          results (sut/v-get base :x {:threshold 0.1})]
+          results (sut/v-get base :x {:threshold 0.1 :verbose? true})]
       (is (= 1 (count results)))
       (is (= 1 (-> results first (dissoc :dot :cos-sim) ffirst)))
       ;; idx nil sim = 1
@@ -157,7 +157,7 @@
     (let [base (sut/vector->vsa [{:x 1} {:x 2}])
           results (sut/v-get base :x {:idx 1 :threshold 0.1})]
       (is (= 1 (count results)))
-      (is (= 2 (-> results first (dissoc :dot :cos-sim) ffirst)))
+      (is (= 2 (-> results first ffirst)))
       ;; idx 1 sim = 1
       (is (= [] (sut/v-get base :x {:idx 1 :threshold 1})))
       ;; idx 1 sim=0 (returns all possible items in mem) 3 + stack count and 0
@@ -170,7 +170,9 @@
                                         (vsa-base/get-hdv :yellow)
                                         (vsa-base/get-hdv :blue)))
           results (sut/v-get base :green {:threshold 0.1})]
-      (is (= [:x :y] (sut/sim-result-keys results))))))
+      (is (= #{:x :y} (->> results
+                           (map ffirst)
+                           (into #{})))))))
 
 
 (deftest test-clj->vsa
@@ -200,7 +202,7 @@
   (let [v (sut/clj->vsa [{:a :blue} {:b :green}])]
     (is (= [[:blue] []]
            (sut/v-map #(->> (sut/v-get % :a {:threshold 0.1})
-                            (sut/sim-result-keys))
+                            (mapv ffirst))
                       v)))
 
     (is (= [#{1 :STACK_COUNT_KEY :blue :a}

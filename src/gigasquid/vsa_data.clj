@@ -30,9 +30,9 @@
    instead of a k. If passed an idx it will pop the pushed map value. If called with a threshold, it will return a vector of all items in memory that have a cosine simalarity threshold greater than or equal to it (range 0-1) example 0.1"
   ([hdv k]
    (v-get hdv k {}))
-  ([hdv k {:keys [idx threshold]}]
+  ([hdv k {:keys [idx threshold verbose?]}]
    (if (nil? idx)
-     (vsa-base/unbind-get hdv k threshold)
+     (vsa-base/unbind-get hdv k threshold verbose?)
      (let [[p-count _] (v-get hdv STACK_COUNT_KEY)
            unprotect-num (- (dec p-count) idx)
            new-v (vsa-base/unprotect-n hdv unprotect-num)]
@@ -86,24 +86,15 @@
         :else (throw (new Exception "Data structure not supported"))))
 
 
-(defn sim-result-keys
-  "Takes results from a similarity search and returns only the keys of the results,
-   stripping off the metrics"
-  [results-with-sim-metrics]
-  (->> results-with-sim-metrics
-       (map #(dissoc % :dot :cos-sim))
-       (map ffirst)))
-
-
 (defn inspect
   "Find all keys embedded in the hdv from mem"
   ([hdv]
    (inspect hdv 0.1))
   ([hdv threshold]
    (->>  @vsa-base/cleanup-mem
-         (map (fn [[k _]]
-                (v-get hdv k {:threshold threshold})))
-         (mapcat sim-result-keys)
+         (mapcat (fn [[k _]]
+                   (v-get hdv k {:threshold threshold})))
+         (mapcat keys)
          (into #{}))))
 
 
@@ -124,6 +115,10 @@
   (vsa-base/reset-hdv-mem!)
   (def base (map->vsa {:x 1 :y 2 :z 3}))
   (def b2 (map->vsa {:a 1}))
+  (v-get base :x {:threshold 0.1})
+
+
+  (v-get b2 :a)
 
   (inspect b2)
 
