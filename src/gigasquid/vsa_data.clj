@@ -27,7 +27,8 @@
 
 (defn v-get
   "Like clojure get with a map but with hdv also works with a value
-   instead of a k. If passed an idx it will pop the pushed map value. If called with a threshold, it will return a vector of all items in memory that have a cosine simalarity threshold greater than or equal to it (range 0-1) example 0.1"
+   instead of a k. If passed an idx it will pop the pushed map value. If called with a threshold, it will return a vector of all items in memory that have a cosine simalarity threshold greater than or equal to it (range 0-1) example 0.1
+  A verbose? key of true will return the actual scores for cosine similarity and dot"
   ([hdv k]
    (v-get hdv k {}))
   ([hdv k {:keys [idx threshold verbose?]}]
@@ -122,16 +123,6 @@
 
   (inspect b2)
 
-  (def x (clj->vsa [{:a :blue} {:b :green}]))
-  (v-map #(first (v-get % :a {:threshold 0.1})) x)
-  (v-map inspect x)
-  (inspect (vsa-base/unprotect x))
-  (inspect x)
-
-
-  ;;; test for v-map
-  ;; filter function
-  ;; v-map function (example v-map v-get)
   ;; v-filter function (example v-filter v-get)
   
 
