@@ -1,7 +1,7 @@
 (ns gigasquid.vsa-data
   "clojure data structures to hyperdimensional vectors"
   (:require
-    [gigasquid.vsa-base :as vsa-base]))
+    [gigasquid.vsa-base :as vb]))
 
 
 (def STACK_COUNT_KEY :STACK_COUNT_KEY)
@@ -10,11 +10,11 @@
 (defn vsa-assoc
   "Like clojure assoc but result is bundled hdv. For non nested kvs"
   ([hdv k v]
-   (let [mem-k (or (vsa-base/get-hdv k) (vsa-base/add-hdv! k))
-         mem-v (or (vsa-base/get-hdv v) (vsa-base/add-hdv! v))
-         mem-hdv (or hdv (vsa-base/hdv))
-         kv (vsa-base/bind mem-k mem-v)]
-     (vsa-base/bundle mem-hdv kv)))
+   (let [mem-k (or (vb/get-hdv k) (vb/add-hdv! k))
+         mem-v (or (vb/get-hdv v) (vb/add-hdv! v))
+         mem-hdv (or hdv (vb/hdv))
+         kv (vb/bind mem-k mem-v)]
+     (vb/bundle mem-hdv kv)))
   ([hdv k v & kvs]
    (let [ret (vsa-assoc hdv k v)]
      (if kvs
@@ -33,10 +33,10 @@
    (v-get hdv k {}))
   ([hdv k {:keys [idx threshold verbose?]}]
    (if (nil? idx)
-     (vsa-base/unbind-get hdv k threshold verbose?)
+     (vb/unbind-get hdv k threshold verbose?)
      (let [[p-count _] (v-get hdv STACK_COUNT_KEY)
            unprotect-num (- (dec p-count) idx)
-           new-v (vsa-base/unprotect-n hdv unprotect-num)]
+           new-v (vb/unprotect-n hdv unprotect-num)]
        (v-get new-v k {:threshold threshold})))))
 
 
@@ -45,18 +45,18 @@
   [m]
   (when-not (empty? m)
     (reduce (fn [ret-hdv [k v]]
-              (let [mem-k (or (vsa-base/get-hdv k) (vsa-base/add-hdv! k))
-                    mem-v (or (vsa-base/get-hdv v) (vsa-base/add-hdv! v))
-                    kv (vsa-base/bind mem-k mem-v)]
-                (vsa-base/bundle ret-hdv kv)))
-            (vsa-base/hdv)
+              (let [mem-k (or (vb/get-hdv k) (vb/add-hdv! k))
+                    mem-v (or (vb/get-hdv v) (vb/add-hdv! v))
+                    kv (vb/bind mem-k mem-v)]
+                (vb/bundle ret-hdv kv)))
+            (vb/hdv)
             m)))
 
 
 (defn vsa-stack-vector
   "Inits a clojure like vector/stack into the HDV denoted by a key/value pair that indicates the number of elements in the stack - defaults to 0"
   []
-  (vsa-assoc (vsa-base/hdv) STACK_COUNT_KEY 0))
+  (vsa-assoc (vb/hdv) STACK_COUNT_KEY 0))
 
 
 (defn vsa-conj
@@ -64,10 +64,10 @@
   [base-hdv target-hdv]
   (let [[p-count _] (v-get base-hdv STACK_COUNT_KEY)
         new-p-count (inc p-count)
-        protected-base-hdv (vsa-base/protect base-hdv)]
+        protected-base-hdv (vb/protect base-hdv)]
     (-> protected-base-hdv
         (vsa-assoc STACK_COUNT_KEY new-p-count)
-        (vsa-base/bundle target-hdv))))
+        (vb/bundle target-hdv))))
 
 
 (defn vector->vsa
@@ -92,7 +92,7 @@
   ([hdv]
    (inspect hdv 0.1))
   ([hdv threshold]
-   (->>  @vsa-base/cleanup-mem
+   (->>  @vb/cleanup-mem
          (mapcat (fn [[k _]]
                    (v-get hdv k {:threshold threshold})))
          (mapcat keys)
@@ -108,7 +108,7 @@
            result []]
       (if (zero? i)
         (reverse result) ; reverse because the unprotect does it in stack order
-        (recur (vsa-base/unprotect new-v) (dec i) (conj result (f new-v)))))))
+        (recur (vb/unprotect new-v) (dec i) (conj result (f new-v)))))))
 
 
 (defn v-filter
@@ -123,6 +123,6 @@
         (->> (reverse result)
              (remove nil?)) ; reverse because the unprotect does it in stack order
         (do
-          (recur (vsa-base/unprotect new-v)
+          (recur (vb/unprotect new-v)
                  (dec i)
                  (conj result (when (not-empty (pred new-v)) new-v))))))))
