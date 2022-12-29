@@ -25,19 +25,19 @@
        ret))))
 
 
-(defn v-get
+(defn vsa-get
   "Like clojure get with a map but with hdv also works with a value
    instead of a k. If passed an idx it will pop the pushed map value. If called with a threshold, it will return a vector of all items in memory that have a cosine simalarity threshold greater than or equal to it (range 0-1) example 0.1
   A verbose? key of true will return the actual scores for cosine similarity and dot"
   ([hdv k]
-   (v-get hdv k {}))
+   (vsa-get hdv k {}))
   ([hdv k {:keys [idx threshold verbose?]}]
    (if (nil? idx)
      (vb/unbind-get hdv k threshold verbose?)
-     (let [[p-count _] (v-get hdv STACK_COUNT_KEY)
+     (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)
            unprotect-num (- (dec p-count) idx)
            new-v (vb/unprotect-n hdv unprotect-num)]
-       (v-get new-v k {:threshold threshold})))))
+       (vsa-get new-v k {:threshold threshold})))))
 
 
 (defn map->vsa
@@ -62,7 +62,7 @@
 (defn vsa-conj
   "Adds (bundles) the target hdv to the base hdv in a stack context but first protects it by rotation. Need to call vsa-init-stack on the base-hdv first"
   [base-hdv target-hdv]
-  (let [[p-count _] (v-get base-hdv STACK_COUNT_KEY)
+  (let [[p-count _] (vsa-get base-hdv STACK_COUNT_KEY)
         new-p-count (inc p-count)
         protected-base-hdv (vb/protect base-hdv)]
     (-> protected-base-hdv
@@ -87,22 +87,22 @@
         :else (throw (new Exception "Data structure not supported"))))
 
 
-(defn inspect
+(defn vsa-inspect
   "Find all keys embedded in the hdv from mem"
   ([hdv]
-   (inspect hdv 0.1))
+   (vsa-inspect hdv 0.1))
   ([hdv threshold]
    (->>  @vb/cleanup-mem
          (mapcat (fn [[k _]]
-                   (v-get hdv k {:threshold threshold})))
+                   (vsa-get hdv k {:threshold threshold})))
          (mapcat keys)
          (into #{}))))
 
 
-(defn v-map
+(defn vsa-map
   "Takes a hdv and maps the function across all the stack items in it. Unrolling stack from back to front"
   [f hdv]
-  (let [[p-count _] (v-get hdv STACK_COUNT_KEY)]
+  (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)]
     (loop [new-v hdv
            i p-count
            result []]
@@ -111,11 +111,11 @@
         (recur (vb/unprotect new-v) (dec i) (conj result (f new-v)))))))
 
 
-(defn v-filter
+(defn vsa-filter
   "Takes a hdv and filters the predicate across all the stack items in it. Unrolling stack from back to front.
   Returns a vector of the hdvs in the stack that match the predicate"
   [pred hdv]
-  (let [[p-count _] (v-get hdv STACK_COUNT_KEY)]
+  (let [[p-count _] (vsa-get hdv STACK_COUNT_KEY)]
     (loop [new-v hdv
            i p-count
            result []]
