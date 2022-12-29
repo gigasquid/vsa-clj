@@ -2,7 +2,7 @@
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
         cnuernber/dtype-next {:mvn/version "9.028"}}
  :aliases
- {:test {:extra-paths ["test"]
+ {:test {:extra-paths ["test" "examples"]
          :extra-deps {io.github.cognitect-labs/test-runner
                       {:git/url "https://github.com/cognitect-labs/test-runner.git"
                        :sha "9e35c979860c75555adaff7600070c60004a0f44"}}
