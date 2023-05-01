@@ -1,6 +1,6 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
-        cnuernber/dtype-next {:mvn/version "9.028"}}
+        cnuernber/dtype-next {:mvn/version "10.000-beta-49"}}
  :aliases
  {:test {:extra-paths ["test" "examples"]
          :extra-deps {io.github.cognitect-labs/test-runner
