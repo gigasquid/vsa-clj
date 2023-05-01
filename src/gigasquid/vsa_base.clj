@@ -9,7 +9,7 @@
 
 ;; Uses Gaylor Method for HDV Operations
 
-(def size 1e6)  ; big enough for the "Blessing of Dimensionality"
+(def size 1e4)  ; big enough for the "Blessing of Dimensionality" (at least 10,000)
 
 (defn binary-rand
   "Choose a random binary magnitude for the vector +1 or -1"
