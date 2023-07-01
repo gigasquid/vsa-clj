@@ -8,8 +8,13 @@
 ;; https://link.springer.com/article/10.1007/s13218-019-00623-z
 
 ;; Uses Gaylor Method for HDV Operations
+(def size (atom 1e4))  ; big enough for the "Blessing of Dimensionality" (at least 10,000)
 
-(def size 1e4)  ; big enough for the "Blessing of Dimensionality" (at least 10,000)
+
+(defn set-size!
+  [n]
+  (reset! size n))
+
 
 (defn binary-rand
   "Choose a random binary magnitude for the vector +1 or -1"
@@ -20,7 +25,7 @@
 (defn hdv
   "Create a random hyperdimensional vector of default size"
   []
-  (dtt/->tensor (repeatedly size #(binary-rand)) :datatype :int8))
+  (dtt/->tensor (repeatedly @size #(binary-rand)) :datatype :int8))
 
 
 (defn bundle-op
