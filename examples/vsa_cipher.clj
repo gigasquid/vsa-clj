@@ -1,11 +1,10 @@
-(ns gigasquid.vsa-cipher
+(ns vsa-cipher
   (:require
     [gigasquid.image :as image]
     [gigasquid.vsa-base :as vb]
     [gigasquid.vsa-data :as vd]))
 
 
-;; keywords for the alphabet and space and an end of message symbol
 (def alphabet
   [:a :b :c :d :e :f :g :h :i :j :k :l :m :n :o :p :q :r :s :t :u :v :w :x :y :z :end-of-message])
 
@@ -16,6 +15,7 @@
 
 
 (defn add-keys-to-cleanup-mem!
+  "Take a single hdv as a seed and create an alphabet + numbers of them by using rotation/ protect"
   [seed-hdv]
   (vb/reset-hdv-mem!)
   (doall
@@ -28,6 +28,7 @@
 
 
 (defn encode-message
+  "Encode a message using key value pairs with numbers for ordering"
   [message]
   (when (> (count message) max-num)
     (throw (ex-info "message too long" {:allowed-n max-num})))
@@ -40,6 +41,7 @@
 
 
 (defn decode-message
+  "Decode a message by getting the value of the numbered pairs"
   [msg]
   (let [message-v (reduce (fn [res x]
                             (conj res (first (vd/vsa-get msg x))))
