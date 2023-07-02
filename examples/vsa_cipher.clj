@@ -77,15 +77,23 @@
   ;=> "cats"
   
   ;; Now loading up from the picture of the seed-key-hdv
-  (def loaded-key (image/read-image-to-hdv "seed-key-hdv.png"))
+  (def loaded-key (image/read-image-to-hdv "examples/seed-key-hdv.png"))
   (add-keys-to-cleanup-mem! loaded-key)
   (decode-message message)
   ;=> "cats"
 
   ;;; Now loading up the from the picture of the encoded message
-  (def loaded-message (image/read-image-to-hdv "secret-message.png"))
+  (def loaded-message (image/read-image-to-hdv "examples/secret-message.png"))
   (decode-message loaded-message)
-  ;=> "cats"
+  ;;=> "cats"
+
+
+  ;;; Loading from file both
+  (def loaded-key (image/read-image-to-hdv "examples/seed-key-hdv.png"))
+  (add-keys-to-cleanup-mem! loaded-key)
+  (def loaded-message (image/read-image-to-hdv "examples/secret-message.png"))
+  (decode-message loaded-message)
+  
 
 
 )
